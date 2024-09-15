@@ -11,5 +11,27 @@
     body {
         @apply w-full h-full
     }
+}
 
+@layer components {
+    .fade-enter {
+        @apply opacity-0
+    }
+    
+    .fade-enter-active {
+        @apply opacity-100
+    }
+    
+    .fade-exit {
+        @apply opacity-100
+    }
+    
+    .fade-exit-active {
+        @apply opacity-0
+    }
+
+    .fade-enter-active,
+    .fade-exit-active {
+        @apply transition-opacity duration-500
+    }
 }

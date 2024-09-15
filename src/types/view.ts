@@ -3,10 +3,10 @@ import MappableSiteView from "@/views/MappableSiteView";
 import VideoView from "@/views/VideoView";
 import YangoSiteView from "@/views/YangoSiteView";
 
-export type View = keyof typeof VIEWS;
+export type ViewKey = keyof typeof VIEWS;
 
 export interface ComponentProps {
-    onChangeView: ( view: View ) => void;
+    onChangeView: ( view: ViewKey ) => void;
 }
 
 export const VIEWS = {
@@ -16,7 +16,8 @@ export const VIEWS = {
     'mappable': MappableSiteView,
 }
 
-export function getViewComponent( view: View ){
+export type ViewComponent = ReturnType<typeof getViewComponent>
+export function getViewComponent( view: ViewKey ) {
     return VIEWS[ view ];
 }
 
