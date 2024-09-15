@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+    html {
+        @apply w-screen h-screen overscroll-none overflow-hidden select-none;
+    }
+
+    body {
+        @apply w-full h-full
+    }
+
+}
