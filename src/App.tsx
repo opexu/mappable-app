@@ -1,23 +1,21 @@
+import React, { useContext } from 'react';
 import { useRef, useState } from 'react'
-import { getViewComponent, ViewKey } from '@/types/view';
-import React from 'react';
 import { SwitchTransition, CSSTransition } from 'react-transition-group';
+import { IConfig } from './scripts/config';
+import { useView } from './hooks/useView';
+import StateProvider from './context/stateProvider';
+import { StateContext } from './context/configContext';
 
 export default function App() {
-    const [ componentKey, setComponentKey ] = useState<ViewKey>( 'main' );
+
+    const { state, DynamicComponent } = useContext( StateContext );
     const nodeRef = useRef(null);
-
-    function handleComponentChange( view: ViewKey ){
-        setComponentKey( view );
-    }
-
-    const DymanicComponent = getViewComponent( componentKey );
-
+    
     return (
-        <div className='w-full h-full bg-[rgba(236,236,236,1)]'>
+        <div className='w-full h-full'>
             <SwitchTransition mode='out-in'>
                 <CSSTransition
-                key={componentKey}
+                key={state}
                 nodeRef={nodeRef}
                 timeout={500}
                 classNames={{
@@ -29,7 +27,7 @@ export default function App() {
                 unmountOnExit
                 >
                     <div ref={nodeRef} className='w-full h-full'>
-                        <DymanicComponent onChangeView={ handleComponentChange }/>
+                        <DynamicComponent/>
                     </div>
                 </CSSTransition>
             </SwitchTransition>

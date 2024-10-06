@@ -1,7 +1,11 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, protocol, net } from 'electron';
 import path from 'path';
 import { ElectronBlocker, fullLists, Request } from '@cliqz/adblocker-electron';
 import { readFileSync, writeFileSync } from 'fs';
+import { ipcMain } from 'electron';
+import { fillConfig, IConfig, readConfig } from './scripts/config';
+
+const devMode = isDevMode( process.argv.slice( 2 ) );
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if ( require( 'electron-squirrel-startup' ) ) {
@@ -17,28 +21,50 @@ function getUrlToLoad(): string {
     return url;
 }
 
+protocol.registerSchemesAsPrivileged([
+    {
+        scheme: 'mappable',
+        privileges: {
+            secure: true,
+            supportFetchAPI: false,
+            bypassCSP: true,
+            stream: true,
+            standard: true,
+        } 
+    }
+]);
+
 const createWindow = async () => {
     // Create the browser window.
+
     const mainWindow = new BrowserWindow( {
-        autoHideMenuBar: true,
-        width: 800,
-        height: 600,
+        autoHideMenuBar: false,
+        width: 1024,
+        height: 768,
         webPreferences: {
-            devTools: false,
+            devTools: devMode,
             webviewTag: true,
             preload: path.join( __dirname, 'preload.js' ),
+            nodeIntegration: true,
+            contextIsolation: true,
         },
     } );
 
+    const openDevTools = () => {
+        // if ( devMode ) mainWindow.webContents.openDevTools();
+        mainWindow.webContents.openDevTools();
+    }
     // and load the index.html of the app.
     if ( MAIN_WINDOW_VITE_DEV_SERVER_URL ) {
-        mainWindow.loadURL( MAIN_WINDOW_VITE_DEV_SERVER_URL );
+        mainWindow.loadURL( MAIN_WINDOW_VITE_DEV_SERVER_URL ).then( () => openDevTools() );
     } else {
-        mainWindow.loadFile( path.join( __dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html` ) );
+        mainWindow.loadFile( path.join( __dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html` ) ).then( () => openDevTools() );
     }
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    // if( devMode ){
+    //     mainWindow.webContents.openDevTools();
+    // }
     // mainWindow.removeMenu();
 
     const blocker = await ElectronBlocker.fromLists(
@@ -88,8 +114,37 @@ const createWindow = async () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on( 'ready', createWindow );
+const config: IConfig = {
+    idle_timeout_seconds: 10,
+    main_video: '',
+    video_btns: [],
+    site_btns: [],
+};
+const CONFIG_FOLDER_PATH = devMode 
+    ? path.join( __dirname, '..', '..', 'src', 'CONFIG' )
+    : path.join( process.resourcesPath, 'CONFIG' )
+console.log('CONFIG_FOLDER_PATH: ', CONFIG_FOLDER_PATH);
 
+app.on( 'ready', async () => {
+    const target = await readConfig( path.join( CONFIG_FOLDER_PATH, 'config.json' ) );
+    fillConfig( config, target );
+    protocolHandlers();
+    createWindow();
+} );
+ipcMain.on( 'getConfig', ( event ) => {
+    event.sender.send('sendConfig', config);
+    return config; // Возвращаем конфиг при запросе из рендерера
+} );
+
+function protocolHandlers(){
+
+    protocol.handle('mappable', ( req ) => {
+        const videoName = req.url.slice( 'mappable://'.length ).slice( 0, -1 );
+        console.log('videoName: ', videoName)
+        const videoPath = path.join( CONFIG_FOLDER_PATH, videoName );
+        return net.fetch( 'file://' + videoPath );
+    })
+}
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
@@ -109,3 +164,11 @@ app.on( 'activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+function isDevMode( args: string[] ): boolean {
+    console.log( 'args: ', args )
+    const mode = args[ 0 ];
+    if ( mode !== '--mode' ) return false;
+    const value = args[ 1 ];
+    if ( value === 'dev' ) return true;
+    else return false;
+}

@@ -1,0 +1,28 @@
+{
+    "idle_timeout_seconds": 5,
+    "main_video": "ROUTING 2k.mp4",
+    "video_btns": [
+        {
+            "title": "GEOCODING AND SEARCH",
+            "src": "Mappable_Geocoding_and_Search.mp4"
+        },
+        {
+            "title": "INTERACTIVE MAPS",
+            "src": "Mappable_Maps.mp4"
+        },
+        {
+            "title": "NAVIGATION AND ROUTES",
+            "src": "Mappable_Navigation_with_zones.mp4"
+        }
+    ],
+    "site_btns": [
+        {
+            "title": "MAP STYLE EDITOR",
+            "src": "https://mappable.world/map-style-editor?from=home"
+        },
+        {
+            "title": "MAPS",
+            "src": "https://maps.yango.com/11499/dubai/?ll=55.274274%2C25.197169&z=12"
+        }
+    ]
+}
