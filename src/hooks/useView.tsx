@@ -14,6 +14,7 @@ export type ComponentProps = { src: string, onChangeView: () => void };
 export function useView( config: IConfig ){
 
     const [ state, setState ] = useState<IState>( 'main' );
+    const style = config.style === "contain" ? "object-contain" : "object-cover";
 
     function getView( state: IState ): ViewKey {
         if( config.video_btns.findIndex( btn => btn.title === state ) !== -1 ) return ViewKey.VIDEO;
@@ -47,5 +48,5 @@ export function useView( config: IConfig ){
         )
     }
 
-    return { state, DynamicComponent, BtnsComponents }
+    return { state, style, DynamicComponent, BtnsComponents }
 }

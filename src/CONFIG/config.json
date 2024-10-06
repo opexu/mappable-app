@@ -24,5 +24,6 @@
             "title": "MAPS",
             "src": "https://maps.yango.com/11499/dubai/?ll=55.274274%2C25.197169&z=12"
         }
-    ]
+    ],
+    "style": "cover"
 }

@@ -14,8 +14,8 @@ export default function SiteView({ src, onChangeView }: ComponentProps ){
                     <BackArrow/>
                 </div>
             </button>
-            <div className='w-full h-full p-4 rounded-md'>
-                <div className='relative w-full h-full rounded-lg overflow-hidden'>
+            <div className='w-full h-full'>
+                <div className='relative w-full h-full overflow-hidden'>
                     <webview className='absolute top-0 left-0 w-full h-full' src={src}></webview>
                 </div>
             </div>

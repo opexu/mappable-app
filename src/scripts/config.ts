@@ -5,7 +5,8 @@ export interface IConfig {
     idle_timeout_seconds: number,
     main_video: string,
     video_btns: IConfigBtn[],
-    site_btns: IConfigBtn[]
+    site_btns: IConfigBtn[],
+    style: "cover" | "contain"
 }
 
 export interface IConfigBtn {
@@ -45,6 +46,7 @@ export function fillConfig( source: IConfig, target: Partial<IConfig> ){
             source.site_btns.push( btn );
         })
     }
+    if( target.style === "contain" ) source.style = target.style;
 }
 
 function getBtn( target: IConfigBtn ): IConfigBtn | null {

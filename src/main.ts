@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { ipcMain } from 'electron';
 import { fillConfig, IConfig, readConfig } from './scripts/config';
 
-const devMode = isDevMode( process.argv.slice( 2 ) );
+// const devMode = isDevMode( process.argv.slice( 2 ) );
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if ( require( 'electron-squirrel-startup' ) ) {
@@ -38,11 +38,11 @@ const createWindow = async () => {
     // Create the browser window.
 
     const mainWindow = new BrowserWindow( {
-        autoHideMenuBar: false,
+        autoHideMenuBar: app.isPackaged,
         width: 1024,
         height: 768,
         webPreferences: {
-            devTools: devMode,
+            devTools: !app.isPackaged,
             webviewTag: true,
             preload: path.join( __dirname, 'preload.js' ),
             nodeIntegration: true,
@@ -119,8 +119,9 @@ const config: IConfig = {
     main_video: '',
     video_btns: [],
     site_btns: [],
+    style: "cover",
 };
-const CONFIG_FOLDER_PATH = devMode 
+const CONFIG_FOLDER_PATH = !app.isPackaged 
     ? path.join( __dirname, '..', '..', 'src', 'CONFIG' )
     : path.join( process.resourcesPath, 'CONFIG' )
 console.log('CONFIG_FOLDER_PATH: ', CONFIG_FOLDER_PATH);
